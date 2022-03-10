@@ -8,70 +8,61 @@ import (
 
 type Queue struct {
 	sync.Mutex
-	Size int
-	CountN int
-	CurrentN int
+	Size                    int
+	CountApplication        int
+	Counter                 int
+	CountProcessApplication int
 }
 
-func NewQueue(size int, countN int, currentN int) *Queue {
+func NewQueue(queueSize int, countApplication int) *Queue {
 	return &Queue{
-		Size: size,
-		CountN: countN,
-		CurrentN: currentN,
+		Size:                    queueSize,
+		CountApplication:        countApplication,
+		Counter:                 0,
+		CountProcessApplication: countApplication,
 	}
 }
 
-func (c *Queue) Increment(speed int) {
-	var i = 0
-	for {
+func (c *Queue) Write(speed int) {
+	for i := 0; i < c.CountApplication; i++ {
+		time.Sleep(time.Duration(speed) * time.Millisecond)
+
 		c.Lock()
 
-		if i >= c.CountN {
-			return
-		}
+		if c.Counter >= c.Size {
+			c.CountProcessApplication--
+			fmt.Printf("Производитель: очередь заполнена, данные %d отклонены\n", i+1)
 
-		if c.CurrentN == c.Size {
-			fmt.Printf("Производитель: очередь заполнена, данные %d отклонены\n", i + 1)
-			c.CountN -= 1
 			c.Unlock()
-			time.Sleep(time.Duration(speed) * time.Millisecond)
-			i++
+
 			continue
 		}
 
-		c.CurrentN++
-		fmt.Printf("Производитель: данные %d, значение %d\n", i + 1, c.CurrentN)
-		i++
+		c.Counter++
+		fmt.Printf("Производитель: данные %d, в очереди %d\n", i+1, c.Counter)
 
 		c.Unlock()
-
-		time.Sleep(time.Duration(speed) * time.Millisecond)
 	}
 }
 
-func (c *Queue) Decrement(speed int) {
-	var i = 0
-	for {
+func (c *Queue) Read(speed int) {
+	for i := 0; i < c.CountProcessApplication; {
+		time.Sleep(time.Duration(speed) * time.Millisecond)
+
 		c.Lock()
 
-		if i >= c.CountN {
-			return
-		}
-
-		if c.CurrentN == 0 {
+		if c.Counter <= 0 {
 			fmt.Printf("Потребитель: очередь пустая\n")
+
 			c.Unlock()
-			time.Sleep(time.Duration(speed) * time.Millisecond)
-			i++
+
 			continue
 		}
 
-		c.CurrentN--
-		fmt.Printf("Потребитель: данные %d, значение %d\n", i + 1, c.CurrentN)
+		c.Counter--
+		fmt.Printf("Потребитель: данные %d, в очереди %d\n", i+1, c.Counter)
 		i++
 
 		c.Unlock()
-
-		time.Sleep(time.Duration(speed) * time.Millisecond)
 	}
 }

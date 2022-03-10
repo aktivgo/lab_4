@@ -7,9 +7,9 @@ import (
 )
 
 func Run() error {
-	var countN int
+	var countApplication int
 	fmt.Print("Введите количество заявок: ")
-	_, _ = fmt.Scanf("%d\n", &countN)
+	_, _ = fmt.Scanf("%d\n", &countApplication)
 
 	var queueSize int
 	fmt.Print("Введите размер очереди: ")
@@ -22,8 +22,9 @@ func Run() error {
 	var readerSpeed int
 	fmt.Print("Введите скорость работы потребителя(в миллисекундах): ")
 	_, _ = fmt.Scanf("%d\n", &readerSpeed)
+	fmt.Println()
 
-	queue := internal.NewQueue(queueSize, countN, 0)
+	queue := internal.NewQueue(queueSize, countApplication)
 
 	var wg sync.WaitGroup
 
@@ -31,17 +32,17 @@ func Run() error {
 
 	go func() {
 		defer wg.Done()
-		queue.Increment(writerSpeed)
+		queue.Write(writerSpeed)
 	}()
 
 	go func() {
 		defer wg.Done()
-		queue.Decrement(readerSpeed)
+		queue.Read(readerSpeed)
 	}()
 
 	wg.Wait()
 
-	fmt.Println("Программа завершила работу")
+	fmt.Println("\nПрограмма завершила работу")
 
 	return nil
 }
