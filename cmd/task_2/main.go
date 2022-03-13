@@ -1,4 +1,4 @@
-package task_2
+package main
 
 import (
 	"lab_4/internal/task_2"
