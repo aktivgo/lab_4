@@ -67,11 +67,6 @@ func Run() error {
 				return
 			}
 
-			if application == nil {
-				fmt.Printf("Потребитель: очередь пустая\n")
-				continue
-			}
-
 			fmt.Printf("Потребитель: заявка №%d обработана, в очереди %d\n", application.ID, len(applicationChannel))
 		}
 	}()
