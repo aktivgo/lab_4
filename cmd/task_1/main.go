@@ -7,6 +7,6 @@ import (
 
 func main() {
 	if err := task_1.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 }
