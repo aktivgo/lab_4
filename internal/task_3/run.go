@@ -20,26 +20,9 @@ func Run() error {
 	fmt.Print("Введите количество потоков-рабочих: ")
 	_, _ = fmt.Scanf("%d\n", &countWorkers)
 
-	var workerSpeed int
-	fmt.Print("Введите скорость работы потока-рабочего(в миллисекундах): ")
-	_, _ = fmt.Scanf("%d\n", &workerSpeed)
-
-	var countWorkerIterations int
-	fmt.Print("Введите количество итераций потока-рабочего: ")
-	_, _ = fmt.Scanf("%d\n", &countWorkerIterations)
-
 	var countReaders int
 	fmt.Print("Введите количество потоков-читателей: ")
 	_, _ = fmt.Scanf("%d\n", &countReaders)
-
-	var readerSpeed int
-	fmt.Print("Введите скорость работы потока-читателя(в миллисекундах): ")
-	_, _ = fmt.Scanf("%d\n", &readerSpeed)
-
-	var countReaderIterations int
-	fmt.Print("Введите количество итераций потока-читателя: ")
-	_, _ = fmt.Scanf("%d\n", &countReaderIterations)
-	fmt.Println()
 
 	var wgWorker sync.WaitGroup
 	wgWorker.Add(countWorkers)
@@ -49,17 +32,17 @@ func Run() error {
 		go func() {
 			defer wgWorker.Done()
 
-			for j := 0; j < countWorkerIterations; j++ {
-				time.Sleep(time.Duration(workerSpeed) * time.Millisecond)
+			for {
+				time.Sleep(time.Duration(rand.Intn(2000-1)) * time.Millisecond)
 
-				index := rand.Intn(storageSize - 1)
+				index := rand.Intn(storageSize)
 				value := 1 + rand.Intn(8)
 
 				if err := storage.Inc(index, value); err != nil {
 					log.Printf("Рабочий №%d: %s\n", workerNumber, err)
 				}
 
-				log.Printf("Рабочий №%d: итерация %d, индекс %d, значение инкремента %d\n", j+1, workerNumber, index, value)
+				log.Printf("Рабочий №%d: индекс %d, значение %d\n", workerNumber, index, value)
 			}
 		}()
 	}
@@ -72,10 +55,10 @@ func Run() error {
 		go func() {
 			defer wgReader.Done()
 
-			for j := 0; j < countReaderIterations; j++ {
-				time.Sleep(time.Duration(readerSpeed) * time.Millisecond)
+			for {
+				time.Sleep(time.Duration(rand.Intn(2000-1)) * time.Millisecond)
 
-				index := rand.Intn(storageSize - 1)
+				index := rand.Intn(storageSize)
 
 				var value int
 				value, err := storage.Get(index)
@@ -83,7 +66,7 @@ func Run() error {
 					log.Printf("Читатель №%d: %s\n", readerNumber, err)
 				}
 
-				log.Printf("Читатель №%d: итерация %d, индекс = %d, значение = %d\n", j+1, readerNumber, index, value)
+				log.Printf("Читатель №%d: индекс = %d, значение = %d\n", readerNumber, index, value)
 			}
 		}()
 	}
