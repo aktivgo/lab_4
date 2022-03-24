@@ -66,7 +66,7 @@ func Run() error {
 					log.Printf("Читатель №%d: %s\n", readerNumber, err)
 				}
 
-				log.Printf("Читатель №%d: индекс = %d, значение = %d\n", readerNumber, index, value)
+				log.Printf("Читатель №%d: индекс %d, значение %d\n", readerNumber, index, value)
 			}
 		}()
 	}

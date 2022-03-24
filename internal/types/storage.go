@@ -6,7 +6,8 @@ import (
 )
 
 type Storage struct {
-	sync.Mutex
+	rw sync.RWMutex
+	m sync.Mutex
 	Data []int
 }
 
@@ -29,8 +30,8 @@ func initData(size int) []int {
 }
 
 func (s *Storage) Inc(index int, value int) error {
-	s.Lock()
-	defer s.Unlock()
+	s.m.Lock()
+	defer s.m.Unlock()
 
 	if err := s.validateIndex(index); err != nil {
 		return err
@@ -42,6 +43,9 @@ func (s *Storage) Inc(index int, value int) error {
 }
 
 func (s *Storage) Get(index int) (int, error) {
+	s.rw.Lock()
+	defer s.rw.Unlock()
+
 	if err := s.validateIndex(index); err != nil {
 		return 0, err
 	}
